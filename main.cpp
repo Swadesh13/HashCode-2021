@@ -57,6 +57,10 @@ vector<combo> create_next_combo(vector<combo> t1, vector<combo> t2){
     return t3;
 }
 
+int sort_function(combo t1, combo t2){
+    return t1.score>t2.score;
+}
+
 int main(){
     char filename[] = "./Problem/a_example";
     int no_pizza, T2, T3, T4;
@@ -66,5 +70,9 @@ int main(){
     vector<combo> t2 = create_next_combo(t1, t1);
     vector<combo> t3 = create_next_combo(t2, t1);
     vector<combo> t4 = create_next_combo(t3, t1);
+    sort(t1.begin(), t1.end(), sort_function);
+    sort(t2.begin(), t2.end(), sort_function);
+    sort(t3.begin(), t3.end(), sort_function);
+    sort(t4.begin(), t4.end(), sort_function);
     return 0;
 }
