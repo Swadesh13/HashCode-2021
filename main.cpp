@@ -1,34 +1,10 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-class Pizza{
-    int ing;
-    vector<string> ing_list;
-    public:
-    void add_data(int i, vector<string> il){
-        ing = i;
-        ing_list = il;
-    }
-    void show_data(){
-        cout<<ing<<" ";
-        for(auto it=ing_list.begin(); it!=ing_list.end();it++){
-            cout<<*it<<" ";
-        }
-        cout<<"\n";
-    }
-};
-
-class Pizza_list{
-    vector<Pizza> pl;
-    public:
-    void add_data(Pizza p){
-        pl.push_back(p);
-    }
-    void show_data(){
-        for(auto it=pl.begin(); it!=pl.end();it++){
-            (*it).show_data();
-        }
-    }
+struct combo{
+    set<int> pid;
+    set<string> ing_list;
+    int score;
 };
 
 class file_fns{
@@ -37,28 +13,58 @@ class file_fns{
     file_fns(char* fn){
         strcpy(filename, fn);
     }
-    void read_data(int& nop, int& T2, int& T3, int& T4, Pizza_list& pl){
+    vector<combo> create_t1(int& nop, int& T2, int& T3, int& T4){
+        vector<combo> pl;
         ifstream fp(filename);
         if(fp.fail()){
             cout<<"File not opened!\n";
         }
         fp>>nop>>T2>>T3>>T4;
-        int i = nop;
-        while(i--)
-            Pizza p;
-            
-            pl.add_data(p);
+        for(int i=0;i<nop;i++){
+            pl.push_back(combo());
+            int n;
+            fp>>n;
+            pl[i].pid.insert(i);
+            pl[i].score=n*n;
+            while(n--){
+                string s;
+                fp>>s;
+                pl[i].ing_list.insert(s);
+            }
+        }
         fp.close();
+        return pl;
     }
 };
+
+int to_combine(combo t1){
+    return *(t1.pid.rbegin());
+}
+
+vector<combo> create_next_combo(vector<combo> t1, vector<combo> t2){
+    int n = t1.size(), count=0;
+    vector<combo> t3;
+    for(int i=0;i<t1.size();i++){
+        for(int j=to_combine(t1[i])+1;j<t2.size();j++,count++){
+            t3.push_back(combo());
+            t3[count].pid.insert(t1[i].pid.begin(),t1[i].pid.end());
+            t3[count].pid.insert(t2[j].pid.begin(),t2[j].pid.end());
+            t3[count].ing_list.insert(t1[i].ing_list.begin(),t1[i].ing_list.end());
+            t3[count].ing_list.insert(t2[j].ing_list.begin(),t2[j].ing_list.end());
+            t3[count].score=t3[count].ing_list.size()*t3[count].ing_list.size();
+        }
+    }
+    return t3;
+}
 
 int main(){
     char filename[] = "./Problem/a_example";
     int no_pizza, T2, T3, T4;
     file_fns ffns(filename);
-    Pizza_list pl;
-    ffns.read_data(no_pizza, T2, T3, T4, pl);
-    cout<<no_pizza<<" "<<T2<<" "<<T3<<" "<<T4<<endl;
-    pl.show_data();
+    vector<combo> t1;
+    t1 = ffns.create_t1(no_pizza, T2, T3, T4);
+    vector<combo> t2 = create_next_combo(t1, t1);
+    vector<combo> t3 = create_next_combo(t2, t1);
+    vector<combo> t4 = create_next_combo(t3, t1);
     return 0;
 }
